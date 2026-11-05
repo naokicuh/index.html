@@ -2,7 +2,25 @@
   "background_color": "#3452db",
   "dir": "auto",
   "display": "fullscreen",
-  "name": "MyCashFlow",
+  "name": "Cash Flow Mobile",
+  "short_name": "CashFlow",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
   "orientation": "portrait",
   "scope": "/https://naokicuh.github.io/index.html/",
   "short_name": "MCF",
