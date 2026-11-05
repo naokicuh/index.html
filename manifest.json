@@ -6,6 +6,12 @@
   "orientation": "portrait",
   "scope": "/",
   "short_name": "MCF",
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
   "start_url": "https://naokicuh.github.io/index.html/",
   "theme_color": "#ffffff",
   "id": "My Cash Flow",
