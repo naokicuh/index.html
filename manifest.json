@@ -1,7 +1,7 @@
 {
   "background_color": "#000aff",
   "dir": "auto",
-  "display": "fullscreen",
+  "display": "standalone",
   "name": "My Cash Flow",
   "orientation": "portrait",
   "scope": "/",
