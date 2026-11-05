@@ -1,0 +1,21 @@
+{
+  "background_color": "#3452db",
+  "dir": "auto",
+  "display": "fullscreen",
+  "name": "MyCashFlow",
+  "orientation": "portrait",
+  "scope": "/https://naokicuh.github.io/index.html/",
+  "short_name": "MCF",
+  "start_url": "/https://naokicuh.github.io/index.html/",
+  "theme_color": "#00a5f7",
+  "id": "MCF",
+  "description": "my cash flow app",
+  "lang": "id",
+  "display_override": [
+    "window-controls-overlay",
+    "fullscreen"
+  ],
+  "categories": [
+    "books"
+  ]
+}
