@@ -1,0 +1,20 @@
+{
+  "background_color": "#000aff",
+  "dir": "auto",
+  "display": "fullscreen",
+  "name": "My Cash Flow",
+  "orientation": "portrait",
+  "scope": "/",
+  "short_name": "MCF",
+  "start_url": "https://naokicuh.github.io/index.html/",
+  "theme_color": "#ffffff",
+  "id": "My Cash Flow",
+  "description": "my only cash flow app",
+  "lang": "id",
+  "display_override": [
+    "window-controls-overlay",
+    "fullscreen"
+  ],
+  "iarc_rating_id": "12",
+  "prefer_related_applications": false
+}
