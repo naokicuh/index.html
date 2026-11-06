@@ -60,4 +60,491 @@
             <div class="bg-gradient-to-br from-emerald-600 to-teal-700 text-white p-5 rounded-2xl shadow-lg relative overflow-hidden">
                 <div class="flex justify-between items-center">
                     <p class="text-xs font-medium text-emerald-100 uppercase tracking-wider">Total Saldo Kantong <span id="activeCurrencyLabel">MYR</span></p>
-                    <span id="badgeCurrencySymbol" class="bg-white/20 text-[10px] px-2 py-0.5 rounded-
+                    <span id="badgeCurrencySymbol" class="bg-white/20 text-[10px] px-2 py-0.5 rounded-full font-bold">RM</span>
+                </div>
+                <h2 id="totalBalance" class="text-3xl font-extrabold mt-1 tracking-tight">0.00</h2>
+                
+                <div class="grid grid-cols-2 gap-3 mt-4 pt-3 border-t border-white/20">
+                    <div>
+                        <div class="flex items-center space-x-1 text-emerald-200 text-[11px]">
+                            <i class="fa-solid fa-arrow-down-long text-emerald-300"></i>
+                            <span>Pemasukan</span>
+                        </div>
+                        <p id="monthlyIncome" class="text-sm font-bold mt-0.5">0.00</p>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-1 text-rose-200 text-[11px]">
+                            <i class="fa-solid fa-arrow-up-long text-rose-300"></i>
+                            <span>Pengeluaran</span>
+                        </div>
+                        <p id="dailyExpense" class="text-sm font-bold mt-0.5">0.00</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grafik Ringkasan -->
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Statistik Kantong <span id="chartCurrencyTitle">MYR</span></h3>
+                <div class="relative h-44 flex items-center justify-center">
+                    <canvas id="cashflowChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Tombol Aksi Transaksi -->
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="openTransactionModal('income')" class="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 p-3 rounded-xl font-semibold text-xs flex items-center justify-center space-x-2 transition shadow-xs">
+                    <i class="fa-solid fa-circle-plus text-sm"></i>
+                    <span>+ Pemasukan</span>
+                </button>
+                <button onclick="openTransactionModal('expense')" class="bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 hover:bg-rose-100 text-rose-700 dark:text-rose-300 p-3 rounded-xl font-semibold text-xs flex items-center justify-center space-x-2 transition shadow-xs">
+                    <i class="fa-solid fa-circle-minus text-sm"></i>
+                    <span>- Pengeluaran</span>
+                </button>
+            </div>
+
+            <!-- Riwayat Transaksi Terbaru -->
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Terbaru (<span id="recentCurrencyLabel">MYR</span>)</h3>
+                    <button onclick="switchTab('history')" class="text-xs text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">Lihat Semua</button>
+                </div>
+                <div id="recentTransactionsList" class="space-y-2">
+                    <!-- Data transaksi dirender via JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: RIWAYAT TRANSAKSI LENGKAP -->
+        <section id="tab-history" class="space-y-4 hidden">
+            <div class="flex items-center justify-between">
+                <h2 class="text-base font-bold text-slate-900 dark:text-white">Riwayat Kantong <span id="historyCurrencyLabel">MYR</span></h2>
+                <select id="filterType" onchange="renderTransactions()" class="text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-2 py-1">
+                    <option value="all">Semua</option>
+                    <option value="income">Pemasukan</option>
+                    <option value="expense">Pengeluaran</option>
+                </select>
+            </div>
+            <div id="fullTransactionsList" class="space-y-2">
+                <!-- Data transaksi lengkap -->
+            </div>
+        </section>
+
+        <!-- SLIDE 3: PENGATURAN & BACKUP -->
+        <section id="tab-settings" class="space-y-4 hidden">
+            <h2 class="text-base font-bold text-slate-900 dark:text-white">Pengaturan Aplikasi</h2>
+            
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="text-xs font-semibold text-slate-800 dark:text-white">Mode Gelap (Dark Mode)</h4>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400">Tampilan hemat energi & nyaman di mata</p>
+                    </div>
+                    <button onclick="toggleDarkMode()" class="w-11 h-6 bg-slate-300 dark:bg-emerald-600 rounded-full relative transition p-1">
+                        <div id="darkModeToggleDot" class="w-4 h-4 bg-white rounded-full transition-transform transform dark:translate-x-5"></div>
+                    </button>
+                </div>
+                <hr class="border-slate-100 dark:border-slate-800">
+                <div>
+                    <h4 class="text-xs font-semibold text-slate-800 dark:text-white mb-1">Backup & Restore Offline</h4>
+                    <p class="text-[10px] text-slate-500 dark:text-slate-400 mb-3">Simpan data lokal ke dalam berkas JSON untuk dicadangkan secara mandiri.</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="exportDataJSON()" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold py-2 px-3 rounded-xl transition flex items-center justify-center space-x-1.5">
+                            <i class="fa-solid fa-download"></i>
+                            <span>Export JSON</span>
+                        </button>
+                        <label class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold py-2 px-3 rounded-xl transition flex items-center justify-center space-x-1.5 cursor-pointer">
+                            <i class="fa-solid fa-upload"></i>
+                            <span>Import JSON</span>
+                            <input type="file" id="importFile" accept=".json" onchange="importDataJSON(event)" class="hidden">
+                        </label>
+                    </div>
+                </div>
+                <hr class="border-slate-100 dark:border-slate-800">
+                <button onclick="resetAllData()" class="w-full bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 text-xs font-semibold py-2 rounded-xl transition">
+                    <i class="fa-solid fa-trash mr-1"></i> Reset Data Kantong Aktif
+                </button>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: PROFIL PENGGUNA -->
+        <section id="tab-profile" class="space-y-4 hidden">
+            <h2 class="text-base font-bold text-slate-900 dark:text-white">Profil Pengguna</h2>
+            
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 text-center space-y-4">
+                <div class="relative w-20 h-20 mx-auto">
+                    <div id="profileAvatarBox" class="w-20 h-20 rounded-full bg-emerald-500 text-white flex items-center justify-center text-2xl font-bold overflow-hidden border-4 border-emerald-400 shadow-md mx-auto">
+                        <span id="profileAvatarText">U</span>
+                        <img id="profileAvatarImg" src="" alt="Avatar" class="w-full h-full object-cover hidden">
+                    </div>
+                    <label for="uploadAvatar" class="absolute bottom-0 right-0 bg-slate-900 text-white w-7 h-7 rounded-full flex items-center justify-center cursor-pointer shadow-md">
+                        <i class="fa-solid fa-camera text-[10px]"></i>
+                        <input type="file" id="uploadAvatar" accept="image/*" onchange="changeProfileAvatar(event)" class="hidden">
+                    </label>
+                </div>
+
+                <div class="space-y-3 text-left">
+                    <div>
+                        <label class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Nama Pengguna</label>
+                        <input type="text" id="inputProfileName" oninput="saveProfileInfo()" class="w-full mt-1 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Catatan / Profesi</label>
+                        <input type="text" id="inputProfileJob" oninput="saveProfileInfo()" class="w-full mt-1 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- BOTTOM NAVIGATION BAR (SLIDE NAVIGATION) -->
+    <nav class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 fixed bottom-0 left-0 right-0 z-30 max-w-md mx-auto grid grid-cols-4 py-2 px-2 shadow-lg h-[65px]">
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center text-emerald-600 dark:text-emerald-400 transition">
+            <i class="fa-solid fa-wallet text-sm"></i>
+            <span class="text-[10px] font-semibold mt-1">Cashflow</span>
+        </button>
+        <button onclick="switchTab('history')" id="nav-history" class="flex flex-col items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
+            <i class="fa-solid fa-clock-rotate-left text-sm"></i>
+            <span class="text-[10px] font-medium mt-1">Riwayat</span>
+        </button>
+        <button onclick="switchTab('settings')" id="nav-settings" class="flex flex-col items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
+            <i class="fa-solid fa-gear text-sm"></i>
+            <span class="text-[10px] font-medium mt-1">Pengaturan</span>
+        </button>
+        <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
+            <i class="fa-solid fa-user text-sm"></i>
+            <span class="text-[10px] font-medium mt-1">Profil</span>
+        </button>
+    </nav>
+
+    <!-- MODAL TRANSAKSI -->
+    <div id="transactionModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 border border-slate-200 dark:border-slate-800">
+            <div class="flex items-center justify-between">
+                <h3 id="modalTitle" class="text-sm font-bold text-slate-900 dark:text-white">Tambah Transaksi</h3>
+                <button onclick="closeTransactionModal()" class="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+            
+            <form id="transactionForm" onsubmit="handleTransactionSubmit(event)" class="space-y-3">
+                <input type="hidden" id="transType">
+                <div>
+                    <label class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Jumlah Uang (<span id="modalCurrencyLabel">MYR</span>)</label>
+                    <div class="relative mt-1">
+                        <span id="formCurrencySymbol" class="absolute left-3 top-2.5 text-xs font-bold text-slate-400">RM</span>
+                        <input type="number" step="any" id="transAmount" required placeholder="0.00" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl pl-12 pr-3 py-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Keterangan</label>
+                    <input type="text" id="transNote" required placeholder="Contoh: Gaji / Belanja" class="w-full mt-1 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Tanggal</label>
+                    <input type="datetime-local" id="transDate" required class="w-full mt-1 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl transition text-xs shadow-md">
+                    Simpan ke Kantong <span id="btnModalCurrency">MYR</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPT LOGIKA KANTOUNG & OFFLINE STORAGE -->
+    <script>
+        let appData = JSON.parse(localStorage.getItem('cashflow_app_data')) || {
+            currency: 'MYR',
+            darkMode: false,
+            profile: { name: 'Pengguna', job: 'Wirausaha', avatar: '' },
+            transactions: []
+        };
+
+        let chartInstance = null;
+        const symbols = { MYR: 'RM', IDR: 'Rp', USD: '$', SGD: 'S$' };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            applyTheme();
+            document.getElementById('currencySelector').value = appData.currency || 'MYR';
+            document.getElementById('inputProfileName').value = appData.profile.name;
+            document.getElementById('inputProfileJob').value = appData.profile.job;
+            updateProfileUI();
+            updateDashboard();
+            renderTransactions();
+        });
+
+        function switchTab(tabId) {
+            ['dashboard', 'history', 'settings', 'profile'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`nav-${t}`).className = "flex flex-col items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition";
+            });
+            
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            document.getElementById(`nav-${tabId}`).className = "flex flex-col items-center justify-center text-emerald-600 dark:text-emerald-400 transition";
+        }
+
+        function applyTheme() {
+            if (appData.darkMode) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('headerThemeIcon').className = "fa-solid fa-sun text-xs text-amber-400";
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('headerThemeIcon').className = "fa-solid fa-moon text-xs";
+            }
+            if(chartInstance) updateDashboard();
+        }
+
+        function toggleDarkMode() {
+            appData.darkMode = !appData.darkMode;
+            applyTheme();
+            saveDataOnly();
+        }
+
+        function changeCurrency(val) {
+            appData.currency = val;
+            saveAndRefresh();
+        }
+
+        function formatNumber(amount, curr) {
+            if (curr === 'IDR') {
+                return Number(amount).toLocaleString('id-ID');
+            }
+            return Number(amount).toFixed(2);
+        }
+
+        function saveProfileInfo() {
+            appData.profile.name = document.getElementById('inputProfileName').value || 'Pengguna';
+            appData.profile.job = document.getElementById('inputProfileJob').value || '';
+            updateProfileUI();
+            saveDataOnly();
+        }
+
+        function changeProfileAvatar(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    appData.profile.avatar = e.target.result;
+                    updateProfileUI();
+                    saveDataOnly();
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function updateProfileUI() {
+            const name = appData.profile.name;
+            document.getElementById('headerName').innerText = name;
+            const initials = name.charAt(0).toUpperCase();
+
+            ['headerAvatar', 'profileAvatar'].forEach(prefix => {
+                const img = document.getElementById(`${prefix}Img`);
+                const txt = document.getElementById(`${prefix}Text`);
+                if (appData.profile.avatar) {
+                    img.src = appData.profile.avatar;
+                    img.classList.remove('hidden');
+                    txt.classList.add('hidden');
+                } else {
+                    img.classList.add('hidden');
+                    txt.classList.remove('hidden');
+                    txt.innerText = initials;
+                }
+            });
+        }
+
+        function openTransactionModal(type) {
+            document.getElementById('transType').value = type;
+            const curr = appData.currency || 'MYR';
+            document.getElementById('modalTitle').innerText = (type === 'income' ? 'Tambah Pemasukan ' : 'Tambah Pengeluaran ') + curr;
+            document.getElementById('formCurrencySymbol').innerText = symbols[curr];
+            document.getElementById('modalCurrencyLabel').innerText = curr;
+            document.getElementById('btnModalCurrency').innerText = curr;
+            
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('transDate').value = now.toISOString().slice(0, 16);
+            
+            document.getElementById('transAmount').value = '';
+            document.getElementById('transNote').value = '';
+            document.getElementById('transactionModal').classList.remove('hidden');
+        }
+
+        function closeTransactionModal() {
+            document.getElementById('transactionModal').classList.add('hidden');
+        }
+
+        function handleTransactionSubmit(e) {
+            e.preventDefault();
+            const type = document.getElementById('transType').value;
+            const amount = parseFloat(document.getElementById('transAmount').value);
+            const note = document.getElementById('transNote').value;
+            const date = document.getElementById('transDate').value;
+            const currency = appData.currency || 'MYR';
+
+            appData.transactions.unshift({ id: Date.now(), currency, type, amount, note, date });
+            closeTransactionModal();
+            saveAndRefresh();
+        }
+
+        function deleteTransaction(id) {
+            if (confirm('Hapus transaksi ini dari kantong?')) {
+                appData.transactions = appData.transactions.filter(t => t.id !== id);
+                saveAndRefresh();
+            }
+        }
+
+        function updateDashboard() {
+            const curr = appData.currency || 'MYR';
+            
+            document.getElementById('activeCurrencyLabel').innerText = curr;
+            document.getElementById('badgeCurrencySymbol').innerText = symbols[curr];
+            document.getElementById('chartCurrencyTitle').innerText = curr;
+            document.getElementById('recentCurrencyLabel').innerText = curr;
+            document.getElementById('historyCurrencyLabel').innerText = curr;
+
+            let totalIncome = 0;
+            let totalExpense = 0;
+
+            const currentTransactions = appData.transactions.filter(t => (t.currency || 'MYR') === curr);
+
+            currentTransactions.forEach(t => {
+                if (t.type === 'income') totalIncome += t.amount;
+                else totalExpense += t.amount;
+            });
+
+            const netBalance = totalIncome - totalExpense;
+
+            document.getElementById('totalBalance').innerText = (curr === 'IDR' ? 'Rp ' : symbols[curr] + ' ') + formatNumber(netBalance, curr);
+            document.getElementById('monthlyIncome').innerText = (curr === 'IDR' ? 'Rp ' : symbols[curr] + ' ') + formatNumber(totalIncome, curr);
+            document.getElementById('dailyExpense').innerText = (curr === 'IDR' ? 'Rp ' : symbols[curr] + ' ') + formatNumber(totalExpense, curr);
+
+            renderChart(totalIncome, totalExpense);
+            renderTransactions();
+        }
+
+        function renderChart(income, expense) {
+            const ctx = document.getElementById('cashflowChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pemasukan', 'Pengeluaran'],
+                    datasets: [{
+                        data: [income || 1, expense || 0],
+                        backgroundColor: ['#10b981', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: appData.darkMode ? '#cbd5e1' : '#475569',
+                                font: { family: 'Plus Jakarta Sans', size: 11 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderTransactions() {
+            const recentContainer = document.getElementById('recentTransactionsList');
+            const fullContainer = document.getElementById('fullTransactionsList');
+            const filter = document.getElementById('filterType').value;
+            const curr = appData.currency || 'MYR';
+
+            recentContainer.innerHTML = '';
+            fullContainer.innerHTML = '';
+
+            const currentTransactions = appData.transactions.filter(t => (t.currency || 'MYR') === curr);
+            const filtered = currentTransactions.filter(t => filter === 'all' || t.type === filter);
+
+            if (filtered.length === 0) {
+                const emptyHTML = `<p class="text-xs text-center text-slate-400 py-4">Belum ada catatan di kantong ${curr}.</p>`;
+                recentContainer.innerHTML = emptyHTML;
+                fullContainer.innerHTML = emptyHTML;
+                return;
+            }
+
+            filtered.forEach((t, idx) => {
+                const isInc = t.type === 'income';
+                const formattedAmt = curr === 'IDR' ? 'Rp ' + formatNumber(t.amount, curr) : symbols[curr] + ' ' + formatNumber(t.amount, curr);
+                
+                const itemHTML = `
+                    <div class="flex items-center justify-between p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-full ${isInc ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400' : 'bg-rose-100 text-rose-600 dark:bg-rose-950 dark:text-rose-400'} flex items-center justify-center text-xs">
+                                <i class="fa-solid ${isInc ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-slate-800 dark:text-slate-200">${t.note}</p>
+                                <p class="text-[10px] text-slate-400">${new Date(t.date).toLocaleDateString('id-ID', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs font-bold ${isInc ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}">
+                                ${isInc ? '+' : '-'}${formattedAmt}
+                            </span>
+                            <button onclick="deleteTransaction(${t.id})" class="text-slate-300 hover:text-rose-500 text-xs px-1">
+                                <i class="fa-solid fa-trash text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                if (idx < 5) recentContainer.innerHTML += itemHTML;
+                fullContainer.innerHTML += itemHTML;
+            });
+        }
+
+        function saveDataOnly() {
+            localStorage.setItem('cashflow_app_data', JSON.stringify(appData));
+        }
+
+        function saveAndRefresh() {
+            saveDataOnly();
+            updateDashboard();
+        }
+
+        function exportDataJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `cashflow_backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importDataJSON(event) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    appData = JSON.parse(e.target.result);
+                    saveAndRefresh();
+                    applyTheme();
+                    document.getElementById('currencySelector').value = appData.currency || 'MYR';
+                    updateProfileUI();
+                    alert('Data cadangan berhasil diimpor!');
+                } catch(err) {
+                    alert('Format file cadangan tidak valid.');
+                }
+            };
+            reader.readAsText(event.target.files[0]);
+        }
+
+        function resetAllData() {
+            const curr = appData.currency || 'MYR';
+            if (confirm(`Apakah Anda yakin ingin menghapus seluruh transaksi khusus di kantong ${curr}?`)) {
+                appData.transactions = appData.transactions.filter(t => (t.currency || 'MYR') !== curr);
+                saveAndRefresh();
+            }
+        }
+    </script>
+</body>
+</html>
