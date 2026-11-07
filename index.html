@@ -14,7 +14,6 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
         
-        /* Membuka kunci scroll pada seluruh halaman */
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
             overflow-y: auto !important; 
@@ -108,7 +107,7 @@
                 </button>
             </div>
 
-            <!-- Riwayat Transaksi Panjang (Seluruh Beranda Bisa Digulir) -->
+            <!-- Riwayat Transaksi Panjang -->
             <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs mb-10">
                 <div class="flex items-center justify-between mb-3">
                     <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Riwayat Transaksi (<span id="recentCurrencyLabel">MYR</span>)</h3>
@@ -223,7 +222,7 @@
         </button>
     </nav>
 
-    <!-- MODAL TRANSAKSI -->
+    <!-- MODAL TAMBAH TRANSAKSI -->
     <div id="transactionModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
         <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 border border-slate-200 dark:border-slate-800 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between">
@@ -243,7 +242,6 @@
                     </div>
                 </div>
 
-                <!-- PILIHAN KATEGORI DENGAN IKON -->
                 <div>
                     <label class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Kategori Transaksi</label>
                     <select id="transCategory" class="w-full mt-1 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
@@ -271,7 +269,37 @@
         </div>
     </div>
 
-    <!-- SCRIPT LOGIKA KANTOUNG & KATEGORI -->
+    <!-- MODAL EDIT KATEGORI -->
+    <div id="editCategoryModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-2xl p-5 space-y-4 border border-slate-200 dark:border-slate-800">
+            <div class="flex items-center justify-between">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white">Ubah Kategori Transaksi</h3>
+                <button onclick="closeEditModal()" class="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+            
+            <form id="editCategoryForm" onsubmit="handleEditCategorySubmit(event)" class="space-y-3">
+                <input type="hidden" id="editTransId">
+                <div>
+                    <label class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Pilih Kategori Baru</label>
+                    <select id="editCategorySelect" class="w-full mt-1 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="Belanja Makanan">🛒 Belanja Makanan</option>
+                        <option value="Hutang">💳 Hutang</option>
+                        <option value="Pinjaman">🤝 Pinjaman</option>
+                        <option value="Topup Internet">🌐 Topup Internet</option>
+                        <option value="Ubah ke Rupiah">💱 Ubah ke Rupiah</option>
+                        <option value="Transaksi Lainnya">📌 Transaksi Lainnya</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl transition text-xs shadow-md">
+                    Simpan Perubahan
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPT LOGIKA KANTOUNG & EDIT KATEGORI -->
     <script>
         let appData = JSON.parse(localStorage.getItem('cashflow_app_data')) || {
             currency: 'MYR',
@@ -417,6 +445,30 @@
             saveAndRefresh();
         }
 
+        // FUNGSI MEMBUKA MODAL EDIT KATEGORI
+        function openEditModal(id, currentCategory) {
+            document.getElementById('editTransId').value = id;
+            document.getElementById('editCategorySelect').value = currentCategory || 'Transaksi Lainnya';
+            document.getElementById('editCategoryModal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editCategoryModal').classList.add('hidden');
+        }
+
+        function handleEditCategorySubmit(e) {
+            e.preventDefault();
+            const id = parseInt(document.getElementById('editTransId').value);
+            const newCategory = document.getElementById('editCategorySelect').value;
+
+            const targetTx = appData.transactions.find(t => t.id === id);
+            if (targetTx) {
+                targetTx.category = newCategory;
+                closeEditModal();
+                saveAndRefresh();
+            }
+        }
+
         function deleteTransaction(id) {
             if (confirm('Hapus transaksi ini dari kantong?')) {
                 appData.transactions = appData.transactions.filter(t => t.id !== id);
@@ -503,8 +555,9 @@
             currentTransactions.forEach((t) => {
                 const isInc = t.type === 'income';
                 const formattedAmt = curr === 'IDR' ? 'Rp ' + formatNumber(t.amount, curr) : symbols[curr] + ' ' + formatNumber(t.amount, curr);
-                const iconClass = categoryIcons[t.category] || 'fa-tag';
-                const displayText = t.note ? `${t.category} - ${t.note}` : t.category;
+                const catName = t.category || 'Transaksi Lainnya';
+                const iconClass = categoryIcons[catName] || 'fa-tag';
+                const displayText = t.note ? `${catName} - ${t.note}` : catName;
                 
                 const itemHTML = `
                     <div class="flex items-center justify-between p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
@@ -521,7 +574,12 @@
                             <span class="text-xs font-bold ${isInc ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}">
                                 ${isInc ? '+' : '-'}${formattedAmt}
                             </span>
-                            <button onclick="deleteTransaction(${t.id})" class="text-slate-300 hover:text-rose-500 text-xs px-1">
+                            <!-- Tombol Edit Kategori -->
+                            <button onclick="openEditModal(${t.id}, '${catName}')" class="text-slate-400 hover:text-emerald-500 text-xs px-1" title="Ubah Kategori">
+                                <i class="fa-solid fa-pen-to-square text-[11px]"></i>
+                            </button>
+                            <!-- Tombol Hapus -->
+                            <button onclick="deleteTransaction(${t.id})" class="text-slate-300 hover:text-rose-500 text-xs px-1" title="Hapus">
                                 <i class="fa-solid fa-trash text-[10px]"></i>
                             </button>
                         </div>
