@@ -303,7 +303,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT LOGIKA KANTOUNG & EDIT KATEGORI -->
+    <!-- SCRIPT LOGIKA KANTOUNG & WARNA KATEGORI -->
     <script>
         let appData = JSON.parse(localStorage.getItem('cashflow_app_data')) || {
             currency: 'MYR',
@@ -315,15 +315,16 @@
         let chartInstance = null;
         const symbols = { MYR: 'RM', IDR: 'Rp', USD: '$', SGD: 'S$' };
 
-        const categoryIcons = {
-            'Belanja': 'fa-cart-shopping',
-            'Gaji': 'fa-money-bill-wave',
-            'Hutang Teman': 'fa-credit-card',
-            'Pinjaman Saya': 'fa-handshake',
-            'Topup Internet': 'fa-wifi',
-            'Entertainment': 'fa-film',
-            'Ubah ke Rupiah': 'fa-right-left',
-            'Transaksi Lainnya': 'fa-tag'
+        // Konfigurasi Ikon dan Warna Unik untuk Setiap Kategori
+        const categoryConfig = {
+            'Belanja': { icon: 'fa-cart-shopping', color: 'bg-amber-100 text-amber-600 dark:bg-amber-950 dark:text-amber-400' },
+            'Gaji': { icon: 'fa-money-bill-wave', color: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400' },
+            'Hutang Teman': { icon: 'fa-credit-card', color: 'bg-purple-100 text-purple-600 dark:bg-purple-950 dark:text-purple-400' },
+            'Pinjaman Saya': { icon: 'fa-handshake', color: 'bg-indigo-100 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400' },
+            'Topup Internet': { icon: 'fa-wifi', color: 'bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400' },
+            'Entertainment': { icon: 'fa-film', color: 'bg-pink-100 text-pink-600 dark:bg-pink-950 dark:text-pink-400' },
+            'Ubah ke Rupiah': { icon: 'fa-right-left', color: 'bg-orange-100 text-orange-600 dark:bg-orange-950 dark:text-orange-400' },
+            'Transaksi Lainnya': { icon: 'fa-tag', color: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300' }
         };
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -561,14 +562,16 @@
                 const isInc = t.type === 'income';
                 const formattedAmt = curr === 'IDR' ? 'Rp ' + formatNumber(t.amount, curr) : symbols[curr] + ' ' + formatNumber(t.amount, curr);
                 const catName = t.category || 'Transaksi Lainnya';
-                const iconClass = categoryIcons[catName] || 'fa-tag';
+                
+                // Ambil konfigurasi ikon dan warna berdasarkan kategori
+                const config = categoryConfig[catName] || { icon: 'fa-tag', color: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300' };
                 const displayText = t.note ? `${catName} - ${t.note}` : catName;
                 
                 const itemHTML = `
                     <div class="flex items-center justify-between p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
                         <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 rounded-full ${isInc ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400' : 'bg-rose-100 text-rose-600 dark:bg-rose-950 dark:text-rose-400'} flex items-center justify-center text-xs">
-                                <i class="fa-solid ${iconClass}"></i>
+                            <div class="w-8 h-8 rounded-full ${config.color} flex items-center justify-center text-xs shadow-xs">
+                                <i class="fa-solid ${config.icon}"></i>
                             </div>
                             <div>
                                 <p class="text-xs font-semibold text-slate-800 dark:text-slate-200">${displayText}</p>
