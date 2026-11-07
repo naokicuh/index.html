@@ -245,10 +245,12 @@
                 <div>
                     <label class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Kategori Transaksi</label>
                     <select id="transCategory" class="w-full mt-1 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                        <option value="Belanja Makanan">🛒 Belanja Makanan</option>
-                        <option value="Hutang">💳 Hutang</option>
-                        <option value="Pinjaman">🤝 Pinjaman</option>
+                        <option value="Belanja">🛒 Belanja</option>
+                        <option value="Gaji">💰 Gaji</option>
+                        <option value="Hutang Teman">💳 Hutang Teman</option>
+                        <option value="Pinjaman Saya">🤝 Pinjaman Saya</option>
                         <option value="Topup Internet">🌐 Topup Internet</option>
+                        <option value="Entertainment">🎬 Entertainment</option>
                         <option value="Ubah ke Rupiah">💱 Ubah ke Rupiah</option>
                         <option value="Transaksi Lainnya">📌 Transaksi Lainnya</option>
                     </select>
@@ -284,10 +286,12 @@
                 <div>
                     <label class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Pilih Kategori Baru</label>
                     <select id="editCategorySelect" class="w-full mt-1 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                        <option value="Belanja Makanan">🛒 Belanja Makanan</option>
-                        <option value="Hutang">💳 Hutang</option>
-                        <option value="Pinjaman">🤝 Pinjaman</option>
+                        <option value="Belanja">🛒 Belanja</option>
+                        <option value="Gaji">💰 Gaji</option>
+                        <option value="Hutang Teman">💳 Hutang Teman</option>
+                        <option value="Pinjaman Saya">🤝 Pinjaman Saya</option>
                         <option value="Topup Internet">🌐 Topup Internet</option>
+                        <option value="Entertainment">🎬 Entertainment</option>
                         <option value="Ubah ke Rupiah">💱 Ubah ke Rupiah</option>
                         <option value="Transaksi Lainnya">📌 Transaksi Lainnya</option>
                     </select>
@@ -312,10 +316,12 @@
         const symbols = { MYR: 'RM', IDR: 'Rp', USD: '$', SGD: 'S$' };
 
         const categoryIcons = {
-            'Belanja Makanan': 'fa-cart-shopping',
-            'Hutang': 'fa-credit-card',
-            'Pinjaman': 'fa-handshake',
+            'Belanja': 'fa-cart-shopping',
+            'Gaji': 'fa-money-bill-wave',
+            'Hutang Teman': 'fa-credit-card',
+            'Pinjaman Saya': 'fa-handshake',
             'Topup Internet': 'fa-wifi',
+            'Entertainment': 'fa-film',
             'Ubah ke Rupiah': 'fa-right-left',
             'Transaksi Lainnya': 'fa-tag'
         };
@@ -423,7 +429,7 @@
             
             document.getElementById('transAmount').value = '';
             document.getElementById('transNote').value = '';
-            document.getElementById('transCategory').value = 'Belanja Makanan';
+            document.getElementById('transCategory').value = 'Belanja';
             document.getElementById('transactionModal').classList.remove('hidden');
         }
 
@@ -445,7 +451,6 @@
             saveAndRefresh();
         }
 
-        // FUNGSI MEMBUKA MODAL EDIT KATEGORI
         function openEditModal(id, currentCategory) {
             document.getElementById('editTransId').value = id;
             document.getElementById('editCategorySelect').value = currentCategory || 'Transaksi Lainnya';
@@ -574,11 +579,9 @@
                             <span class="text-xs font-bold ${isInc ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}">
                                 ${isInc ? '+' : '-'}${formattedAmt}
                             </span>
-                            <!-- Tombol Edit Kategori -->
                             <button onclick="openEditModal(${t.id}, '${catName}')" class="text-slate-400 hover:text-emerald-500 text-xs px-1" title="Ubah Kategori">
                                 <i class="fa-solid fa-pen-to-square text-[11px]"></i>
                             </button>
-                            <!-- Tombol Hapus -->
                             <button onclick="deleteTransaction(${t.id})" class="text-slate-300 hover:text-rose-500 text-xs px-1" title="Hapus">
                                 <i class="fa-solid fa-trash text-[10px]"></i>
                             </button>
