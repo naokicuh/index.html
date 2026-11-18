@@ -247,6 +247,7 @@
                     <select id="transCategory" class="w-full mt-1 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
                         <option value="Belanja">🛒 Belanja</option>
                         <option value="Gaji">💰 Gaji</option>
+                        <option value="Advance">💵 Advance</option>
                         <option value="Hutang Teman">💳 Hutang Teman</option>
                         <option value="Pinjaman Saya">🤝 Pinjaman Saya</option>
                         <option value="Topup Internet">🌐 Topup Internet</option>
@@ -258,7 +259,7 @@
 
                 <div>
                     <label class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Keterangan Tambahan (Opsional)</label>
-                    <input type="text" id="transNote" placeholder="Contoh: Nasi Lemak / Toko A" class="w-full mt-1 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <input type="text" id="transNote" placeholder="Contoh: Sisa fisik / Advance Proyek" class="w-full mt-1 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
                 </div>
                 <div>
                     <label class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Tanggal</label>
@@ -288,6 +289,7 @@
                     <select id="editCategorySelect" class="w-full mt-1 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
                         <option value="Belanja">🛒 Belanja</option>
                         <option value="Gaji">💰 Gaji</option>
+                        <option value="Advance">💵 Advance</option>
                         <option value="Hutang Teman">💳 Hutang Teman</option>
                         <option value="Pinjaman Saya">🤝 Pinjaman Saya</option>
                         <option value="Topup Internet">🌐 Topup Internet</option>
@@ -318,6 +320,7 @@
         const categoryConfig = {
             'Belanja': { icon: 'fa-cart-shopping', color: 'bg-amber-100 text-amber-600 dark:bg-amber-950 dark:text-amber-400', chartColor: '#f59e0b' },
             'Gaji': { icon: 'fa-money-bill-wave', color: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400', chartColor: '#10b981' },
+            'Advance': { icon: 'fa-hand-holding-dollar', color: 'bg-cyan-100 text-cyan-600 dark:bg-cyan-950 dark:text-cyan-400', chartColor: '#06b6d4' },
             'Hutang Teman': { icon: 'fa-credit-card', color: 'bg-purple-100 text-purple-600 dark:bg-purple-950 dark:text-purple-400', chartColor: '#8b5cf6' },
             'Pinjaman Saya': { icon: 'fa-handshake', color: 'bg-indigo-100 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400', chartColor: '#6366f1' },
             'Topup Internet': { icon: 'fa-wifi', color: 'bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400', chartColor: '#3b82f6' },
@@ -429,7 +432,7 @@
             
             document.getElementById('transAmount').value = '';
             document.getElementById('transNote').value = '';
-            document.getElementById('transCategory').value = 'Belanja';
+            document.getElementById('transCategory').value = type === 'income' ? 'Gaji' : 'Belanja';
             document.getElementById('transactionModal').classList.remove('hidden');
         }
 
@@ -492,8 +495,6 @@
 
             let totalIncome = 0;
             let totalExpense = 0;
-            
-            // Objek untuk menampung total per kategori pada kantong aktif
             let categoryTotals = {};
 
             const currentTransactions = appData.transactions.filter(t => (t.currency || 'MYR') === curr);
@@ -523,12 +524,10 @@
             const labels = Object.keys(categoryTotals);
             const dataValues = Object.values(categoryTotals);
             
-            // Ambil warna khusus grafik dari konfigurasi kategori
             const backgroundColors = labels.map(cat => {
                 return (categoryConfig[cat] && categoryConfig[cat].chartColor) ? categoryConfig[cat].chartColor : '#64748b';
             });
 
-            // Jika belum ada data transaksi sama sekali, tampilkan placeholder kosong
             const chartLabels = labels.length > 0 ? labels : ['Belum Ada Transaksi'];
             const chartData = dataValues.length > 0 ? dataValues : [1];
             const chartColors = labels.length > 0 ? backgroundColors : ['#cbd5e1'];
@@ -563,6 +562,7 @@
         function renderTransactions() {
             const recentContainer = document.getElementById('recentTransactionsList');
             const fullContainer = document.getElementById('fullTransactionsList');
+            const filter = document.getElementById('filterType') ? document.getElementById('filterType').value : 'all';
             const curr = appData.currency || 'MYR';
 
             recentContainer.innerHTML = '';
@@ -611,7 +611,9 @@
                 `;
 
                 recentContainer.innerHTML += itemHTML;
-                fullContainer.innerHTML += itemHTML;
+                if (filter === 'all' || t.type === filter) {
+                    fullContainer.innerHTML += itemHTML;
+                }
             });
         }
 
